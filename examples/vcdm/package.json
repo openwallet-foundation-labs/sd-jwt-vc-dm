@@ -1,0 +1,17 @@
+{
+  "name": "vcdm-example",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "vcdm": "tsx vcdm.ts",
+    "decode": "tsx decode.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

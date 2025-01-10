@@ -1,0 +1,38 @@
+{
+  "name": "sd-jwt-vcdm",
+  "description": "sd-jwt vcdm implementation in typescript",
+  "scripts": {
+    "build": "lerna run build --stream",
+    "lint": "biome lint ./packages",
+    "format": "biome format . --write",
+    "biome:ci": "biome ci .",
+    "test": "vitest run --coverage.enabled=true --coverage.include=packages/*",
+    "test:watch": "vitest",
+    "clean": "lerna clean -y",
+    "publish:latest": "lerna publish --no-private --conventional-commits --include-merged-tags --create-release github --yes --dist-tag latest",
+    "publish:next": "lerna publish --no-private --conventional-prerelease --force-publish --canary --no-git-tag-version --include-merged-tags --preid next --pre-dist-tag next --yes"
+  },
+  "keywords": [
+    "sd-jwt",
+    "vcdm",
+    "jwt"
+  ],
+  "author": "Lukas.J.Han <lukas.j.han@gmail.com>",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=16"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.6.0",
+    "@types/node": "^20.10.2",
+    "@vitest/coverage-v8": "^1.2.2",
+    "jose": "^5.2.2",
+    "jsdom": "^24.0.0",
+    "lerna": "^8.1.2",
+    "ts-node": "^10.9.1",
+    "tsup": "^8.0.2",
+    "typescript": "^5.7.0",
+    "vite": "^5.1.1",
+    "vitest": "^1.2.2"
+  }
+}
