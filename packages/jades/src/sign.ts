@@ -51,6 +51,11 @@ export class Sign<T extends Record<string, unknown>> {
     return this;
   }
 
+  setDisclosureFrame(frame: DisclosureFrame<T>) {
+    this.disclosureFrame = frame;
+    return this;
+  }
+
   setB64(b64: boolean) {
     if (b64) {
       this.protectedHeader.b64 = undefined;
