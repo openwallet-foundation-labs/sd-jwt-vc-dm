@@ -2,6 +2,8 @@ import { DisclosureFrame } from '@sd-jwt/types';
 import { KeyObject, X509Certificate, createHash, createSign } from 'crypto';
 import { base64urlEncode } from '@sd-jwt/utils';
 import { ALGORITHMS } from './constant';
+import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
+import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 
 export type ProtectedHeader = {
   alg: Alg;
@@ -62,7 +64,7 @@ export class Sign<T extends Record<string, unknown>> {
     this.protectedHeader = {};
   }
 
-  async sign(key: KeyObject) {
+  async sign(key: KeyObject, kid: string) {
     if (
       !this.protectedHeader.alg ||
       (this.protectedHeader.alg as any) === 'none'
@@ -82,7 +84,7 @@ export class Sign<T extends Record<string, unknown>> {
        */
 
       const encodedProtectedHeader = base64urlEncode(
-        JSON.stringify(this.protectedHeader),
+        JSON.stringify({ ...this.protectedHeader, kid }),
       );
       const encodedPayload = '';
       const protectedData = `${encodedProtectedHeader}.${encodedPayload}`;
@@ -106,6 +108,35 @@ export class Sign<T extends Record<string, unknown>> {
       /**
        * Create a General JWS Payload with SD-JWT library.
        */
+
+      const sdjwtInstance = new SDJwtGeneralJSONInstance({
+        hashAlg: 'sha-256',
+        signAlg: this.protectedHeader.alg,
+        hasher: digest,
+        saltGenerator: generateSalt,
+      });
+
+      const generalJSON = await sdjwtInstance.issue(
+        this.payload,
+        this.disclosureFrame,
+        {
+          sigs: [
+            {
+              alg: this.protectedHeader.alg,
+              kid: kid,
+              header: this.protectedHeader,
+              signer: (data: string) => {
+                if (!this.protectedHeader.alg)
+                  throw new Error('alg must be set when signing');
+                return JWTSigner.sign(this.protectedHeader.alg, data, key);
+              },
+            },
+          ],
+        },
+      );
+
+      const serialized = generalJSON.toJson();
+      this.serialized = serialized;
     }
 
     return this;
@@ -203,11 +234,6 @@ export class Sign<T extends Record<string, unknown>> {
 
   setCty(cty: string) {
     this.protectedHeader.cty = cty;
-    return this;
-  }
-
-  setKid(kid: string) {
-    this.protectedHeader.kid = kid;
     return this;
   }
 
