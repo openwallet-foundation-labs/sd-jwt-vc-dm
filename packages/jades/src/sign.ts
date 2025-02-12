@@ -2,7 +2,7 @@ import { DisclosureFrame } from '@sd-jwt/types';
 import { KeyObject, X509Certificate, createHash, createSign } from 'crypto';
 import { base64urlEncode } from '@sd-jwt/utils';
 import { ALGORITHMS } from './constant';
-import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
+import { GeneralJSON, SDJwtGeneralJSONInstance } from '@sd-jwt/core';
 import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 
 export type ProtectedHeader = {
@@ -22,7 +22,7 @@ export type SigD = {
 export type Alg = keyof typeof ALGORITHMS;
 
 export type GeneralJWS = {
-  payload: string | Record<string, unknown>;
+  payload: string;
   signatures: Array<{
     protected: string;
     signature: string;
@@ -31,7 +31,7 @@ export type GeneralJWS = {
      * This is a optional unprotected header.
      *
      */
-    header?: {
+    header: {
       disclosures?: Array<string>;
       kid?: string;
       kb_jwt?: string;
@@ -49,6 +49,10 @@ export class Sign<T extends Record<string, unknown>> {
 
   private protectedHeader: Partial<ProtectedHeader>;
 
+  // TODO: implement
+  // unprotected header
+  private header: Record<string, unknown>;
+
   private disclosureFrame: DisclosureFrame<T> | undefined;
 
   /**
@@ -58,11 +62,50 @@ export class Sign<T extends Record<string, unknown>> {
    */
   constructor(private readonly payload?: T) {
     this.protectedHeader = {};
+    this.header = {};
   }
 
   private async appendSignature(key: KeyObject, kid: string) {
-    // TODO: implement
-    // Add signature in serialized
+    if (this.serialized === undefined) {
+      throw new Error('Signature must be appended to serialized');
+    }
+
+    if (
+      !this.protectedHeader.alg ||
+      (this.protectedHeader.alg as any) === 'none'
+    ) {
+      throw new Error('alg must be set and not "none"');
+    }
+
+    if (this.payload === undefined) {
+      const encodedProtectedHeader = base64urlEncode(
+        JSON.stringify({ ...this.protectedHeader, kid }),
+      );
+      const encodedPayload = '';
+      const protectedData = `${encodedProtectedHeader}.${encodedPayload}`;
+
+      const signature = JWTSigner.sign(
+        this.protectedHeader.alg,
+        protectedData,
+        key,
+      );
+      this.serialized.signatures.push({
+        protected: protectedData,
+        signature,
+        header: this.header,
+      });
+      return this;
+    }
+
+    const generalJSON = GeneralJSON.fromSerialized(this.serialized);
+    const signer = (data: string) => {
+      if (!this.protectedHeader.alg)
+        throw new Error('alg must be set when signing');
+      return JWTSigner.sign(this.protectedHeader.alg, data, key);
+    };
+    await generalJSON.addSignature({ ...this.protectedHeader, kid }, signer);
+    const serialized = generalJSON.toJson();
+    this.serialized = serialized;
     return this;
   }
 
@@ -98,6 +141,7 @@ export class Sign<T extends Record<string, unknown>> {
           {
             protected: encodedProtectedHeader,
             signature,
+            header: this.header,
           },
         ],
       };
