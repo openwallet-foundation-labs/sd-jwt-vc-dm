@@ -1,5 +1,5 @@
+import { DisclosureFrame } from '@sd-jwt/types';
 import { KeyObject, X509Certificate, createHash } from 'crypto';
-import ms, { StringValue } from 'ms';
 
 export type ProtectedHeader = {
   alg: string;
@@ -15,19 +15,36 @@ export type SigD = {
   hash: string;
 };
 
-export class Sign {
+export class Sign<T extends Record<string, unknown>> {
   private protectedHeader: Record<string, unknown>;
+
+  /**
+   * If undefined, the default disclosure frame will be used.
+   * which is set disclosures for every 1-depth property of the payload.
+   */
+  private disclosureFrame: DisclosureFrame<T> | undefined;
 
   /**
    * If payload is empty, the data of payload will be empty string.
    * This is the Detached JWS Payload described in TS 119 182-1 v1.2.1 section 5.2.8
    * The sigD header must be present when the payload is empty.
    */
-  constructor(private readonly payload: Record<string, unknown> | undefined) {
+  constructor(private readonly payload?: T) {
     this.protectedHeader = {};
   }
 
-  async sign(key: KeyObject) {}
+  async sign(key: KeyObject) {
+    if (this.payload === undefined) {
+      /**
+       * If the payload is empty, It uses Detached JWS Payload described in TS 119 182-1 v1.2.1 section 5.2.8
+       * So Create manual signature here.
+       */
+    } else {
+      /**
+       * Create a General JWS Payload with SD-JWT library.
+       */
+    }
+  }
 
   setProtectedHeader(header: ProtectedHeader) {
     this.protectedHeader = header;
@@ -65,17 +82,6 @@ export class Sign {
     if (sigd.mId === 'http://uri.etsi.org/19182/HttpHeaders') {
       this.setB64(false);
     }
-    return this;
-  }
-
-  setExpirationTime(timeString: StringValue) {
-    const miliseconds = ms(timeString);
-    if (miliseconds <= 0) {
-      throw new Error('Expiration time must be greater than 0s');
-    }
-    const iat =
-      (this.protectedHeader.iat as number) ?? Math.floor(Date.now() / 1000);
-    this.protectedHeader.exp = Math.floor(miliseconds / 1000) + iat;
     return this;
   }
 
@@ -119,6 +125,16 @@ export class Sign {
       digAlg: 'sha-512',
       digVal: createHash('sha-512').update(cert.raw).digest('base64url'),
     }));
+    return this;
+  }
+
+  setCty(cty: string) {
+    this.protectedHeader.cty = cty;
+    return this;
+  }
+
+  setKid(kid: string) {
+    this.protectedHeader.kid = kid;
     return this;
   }
 }
