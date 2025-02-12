@@ -34,6 +34,11 @@ export type GeneralJWS = {
       kid?: string;
       kb_jwt?: string;
     };
+
+    /**
+     * TODO: add JAdES unprotected header
+     */
+    etsiU?: any;
   }>;
 };
 
