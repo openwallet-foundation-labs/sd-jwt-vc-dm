@@ -43,7 +43,7 @@ export type GeneralJWS = {
 };
 
 export class Sign<T extends Record<string, unknown>> {
-  private readonly serialized?: GeneralJWS;
+  private serialized?: GeneralJWS;
 
   private protectedHeader: Partial<ProtectedHeader>;
 
@@ -92,6 +92,16 @@ export class Sign<T extends Record<string, unknown>> {
         protectedData,
         key,
       );
+
+      this.serialized = {
+        payload: '',
+        signatures: [
+          {
+            protected: encodedProtectedHeader,
+            signature,
+          },
+        ],
+      };
     } else {
       /**
        * Create a General JWS Payload with SD-JWT library.
