@@ -1,8 +1,10 @@
 import { DisclosureFrame } from '@sd-jwt/types';
-import { KeyObject, X509Certificate, createHash } from 'crypto';
+import { KeyObject, X509Certificate, createHash, createSign } from 'crypto';
+import { base64urlEncode } from '@sd-jwt/utils';
+import { ALGORITHMS } from './constant';
 
 export type ProtectedHeader = {
-  alg: string;
+  alg: Alg;
   typ?: string;
 
   // TODO: define other headers
@@ -15,8 +17,30 @@ export type SigD = {
   hash: string;
 };
 
+export type Alg = keyof typeof ALGORITHMS;
+
+export type GeneralJWS = {
+  payload: string | Record<string, unknown>;
+  signatures: Array<{
+    protected: string;
+    signature: string;
+
+    /**
+     * This is a optional unprotected header.
+     *
+     */
+    header?: {
+      disclosures?: Array<string>;
+      kid?: string;
+      kb_jwt?: string;
+    };
+  }>;
+};
+
 export class Sign<T extends Record<string, unknown>> {
-  private protectedHeader: Record<string, unknown>;
+  private readonly serialized?: GeneralJWS;
+
+  private protectedHeader: Partial<ProtectedHeader>;
 
   /**
    * If undefined, the default disclosure frame will be used.
@@ -34,19 +58,48 @@ export class Sign<T extends Record<string, unknown>> {
   }
 
   async sign(key: KeyObject) {
+    if (
+      !this.protectedHeader.alg ||
+      (this.protectedHeader.alg as any) === 'none'
+    ) {
+      throw new Error('alg must be set and not "none"');
+    }
+
+    if (this.serialized !== undefined) {
+      // TODO: implement
+      // Add signature in serialized
+    }
+
     if (this.payload === undefined) {
       /**
        * If the payload is empty, It uses Detached JWS Payload described in TS 119 182-1 v1.2.1 section 5.2.8
        * So Create manual signature here.
        */
+
+      const encodedProtectedHeader = base64urlEncode(
+        JSON.stringify(this.protectedHeader),
+      );
+      const encodedPayload = '';
+      const protectedData = `${encodedProtectedHeader}.${encodedPayload}`;
+
+      const signature = JWTSigner.sign(
+        this.protectedHeader.alg,
+        protectedData,
+        key,
+      );
     } else {
       /**
        * Create a General JWS Payload with SD-JWT library.
        */
     }
+
+    return this;
   }
 
   setProtectedHeader(header: ProtectedHeader) {
+    if (!header.alg || (header.alg as any) === 'none') {
+      throw new Error('alg must be set and not "none"');
+    }
     this.protectedHeader = header;
     return this;
   }
@@ -141,5 +194,92 @@ export class Sign<T extends Record<string, unknown>> {
   setKid(kid: string) {
     this.protectedHeader.kid = kid;
     return this;
+  }
+
+  toJSON() {
+    if (!this.serialized) {
+      throw new Error('Not signed yet');
+    }
+    return this.serialized;
+  }
+}
+
+class JWTSigner {
+  static sign(alg: Alg, signingInput: string, privateKey: KeyObject) {
+    const signature = this.createSignature(alg, signingInput, privateKey);
+    return signature;
+  }
+
+  static createSignature(
+    alg: Alg,
+    signingInput: string,
+    privateKey: KeyObject,
+  ) {
+    switch (alg) {
+      case 'RS256':
+      case 'RS384':
+      case 'RS512':
+      case 'PS256':
+      case 'PS384':
+      case 'PS512': {
+        const option = ALGORITHMS[alg];
+        return this.createRSASignature(signingInput, privateKey, option);
+      }
+      case 'ES256':
+      case 'ES384':
+      case 'ES512': {
+        const option = ALGORITHMS[alg];
+        return this.createECDSASignature(signingInput, privateKey, option);
+      }
+      case 'EdDSA': {
+        const option = ALGORITHMS[alg];
+        return this.createEdDSASignature(signingInput, privateKey, option);
+      }
+      default:
+    }
+    throw new Error(`Unsupported algorithm: ${alg}`);
+  }
+
+  static createRSASignature(
+    signingInput: string,
+    privateKey: KeyObject,
+    options: { hash: string; padding: number },
+  ) {
+    const signer = createSign(options.hash);
+    signer.update(signingInput);
+    const signature = signer.sign({
+      key: privateKey,
+      padding: options.padding,
+    });
+    return signature.toString('base64url');
+  }
+
+  static createECDSASignature(
+    signingInput: string,
+    privateKey: KeyObject,
+    options: { hash: string; namedCurve: string },
+  ) {
+    const signer = createSign(options.hash);
+    signer.update(signingInput);
+
+    let signature = signer.sign({
+      key: privateKey,
+      dsaEncoding: 'ieee-p1363',
+    });
+
+    return signature.toString('base64url');
+  }
+
+  static createEdDSASignature(
+    signingInput: string,
+    privateKey: KeyObject,
+    options: { curves: string[] },
+  ) {
+    const signer = createSign(options.curves[0]);
+    signer.update(signingInput);
+    const signature = signer.sign({
+      key: privateKey,
+    });
+    return signature.toString('base64url');
   }
 }
