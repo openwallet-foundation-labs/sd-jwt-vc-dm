@@ -49,10 +49,6 @@ export class Sign<T extends Record<string, unknown>> {
 
   private protectedHeader: Partial<ProtectedHeader>;
 
-  /**
-   * If undefined, the default disclosure frame will be used.
-   * which is set disclosures for every 1-depth property of the payload.
-   */
   private disclosureFrame: DisclosureFrame<T> | undefined;
 
   /**
@@ -64,17 +60,18 @@ export class Sign<T extends Record<string, unknown>> {
     this.protectedHeader = {};
   }
 
-  async sign(key: KeyObject, kid: string) {
+  private async appendSignature(key: KeyObject, kid: string) {
+    // TODO: implement
+    // Add signature in serialized
+    return this;
+  }
+
+  private async createSignature(key: KeyObject, kid: string) {
     if (
       !this.protectedHeader.alg ||
       (this.protectedHeader.alg as any) === 'none'
     ) {
       throw new Error('alg must be set and not "none"');
-    }
-
-    if (this.serialized !== undefined) {
-      // TODO: implement
-      // Add signature in serialized
     }
 
     if (this.payload === undefined) {
@@ -104,42 +101,60 @@ export class Sign<T extends Record<string, unknown>> {
           },
         ],
       };
-    } else {
-      /**
-       * Create a General JWS Payload with SD-JWT library.
-       */
-
-      const sdjwtInstance = new SDJwtGeneralJSONInstance({
-        hashAlg: 'sha-256',
-        signAlg: this.protectedHeader.alg,
-        hasher: digest,
-        saltGenerator: generateSalt,
-      });
-
-      const generalJSON = await sdjwtInstance.issue(
-        this.payload,
-        this.disclosureFrame,
-        {
-          sigs: [
-            {
-              alg: this.protectedHeader.alg,
-              kid: kid,
-              header: this.protectedHeader,
-              signer: (data: string) => {
-                if (!this.protectedHeader.alg)
-                  throw new Error('alg must be set when signing');
-                return JWTSigner.sign(this.protectedHeader.alg, data, key);
-              },
-            },
-          ],
-        },
-      );
-
-      const serialized = generalJSON.toJson();
-      this.serialized = serialized;
+      return this;
     }
 
+    /**
+     * Create a General JWS Payload with SD-JWT library.
+     */
+
+    const sdjwtInstance = new SDJwtGeneralJSONInstance({
+      hashAlg: 'sha-256',
+      signAlg: this.protectedHeader.alg,
+      hasher: digest,
+      saltGenerator: generateSalt,
+    });
+
+    const disclosureFrame = this.disclosureFrame;
+
+    const generalJSON = await sdjwtInstance.issue(
+      this.payload,
+      disclosureFrame,
+      {
+        sigs: [
+          {
+            alg: this.protectedHeader.alg,
+            kid: kid,
+            header: this.protectedHeader,
+            signer: (data: string) => {
+              if (!this.protectedHeader.alg)
+                throw new Error('alg must be set when signing');
+              return JWTSigner.sign(this.protectedHeader.alg, data, key);
+            },
+          },
+        ],
+      },
+    );
+
+    const serialized = generalJSON.toJson();
+    this.serialized = serialized;
+
     return this;
+  }
+
+  async sign(key: KeyObject, kid: string) {
+    if (
+      !this.protectedHeader.alg ||
+      (this.protectedHeader.alg as any) === 'none'
+    ) {
+      throw new Error('alg must be set and not "none"');
+    }
+
+    if (this.serialized !== undefined) {
+      return this.appendSignature(key, kid);
+    }
+
+    return this.createSignature(key, kid);
   }
 
   setProtectedHeader(header: ProtectedHeader) {
