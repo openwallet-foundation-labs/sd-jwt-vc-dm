@@ -265,7 +265,7 @@ export class Sign<T extends Record<string, unknown>> {
 
   setX5tS256(cert: X509Certificate) {
     this.protectedHeader['x5t#256'] = createHash('sha-256')
-      .update(cert.raw)
+      .update(new Uint8Array(cert.raw))
       .digest('base64url');
     return this;
   }
@@ -273,7 +273,9 @@ export class Sign<T extends Record<string, unknown>> {
   setX5tSo(cert: X509Certificate) {
     this.protectedHeader['x5t#o'] = {
       digAlg: 'sha-512',
-      digVal: createHash('sha-512').update(cert.raw).digest('base64url'),
+      digVal: createHash('sha-512')
+        .update(new Uint8Array(cert.raw))
+        .digest('base64url'),
     };
     return this;
   }
@@ -286,7 +288,9 @@ export class Sign<T extends Record<string, unknown>> {
     }
     this.protectedHeader['x5t#s'] = certs.map((cert) => ({
       digAlg: 'sha-512',
-      digVal: createHash('sha-512').update(cert.raw).digest('base64url'),
+      digVal: createHash('sha-512')
+        .update(new Uint8Array(cert.raw))
+        .digest('base64url'),
     }));
     return this;
   }
