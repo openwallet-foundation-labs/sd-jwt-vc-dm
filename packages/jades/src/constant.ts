@@ -19,3 +19,12 @@ export const ALGORITHMS = {
   // EdDSA
   EdDSA: { curves: ['ed25519', 'ed448'] },
 };
+
+export enum CommitmentOIDs {
+  proofOfOrigin = '1.2.840.113549.1.9.16.6.1',
+  proofOfReceipt = '1.2.840.113549.1.9.16.6.2',
+  proofOfDelivery = '1.2.840.113549.1.9.16.6.3',
+  proofOfSender = '1.2.840.113549.1.9.16.6.4',
+  proofOfApproval = '1.2.840.113549.1.9.16.6.5',
+  proofOfCreation = '1.2.840.113549.1.9.16.6.6',
+}

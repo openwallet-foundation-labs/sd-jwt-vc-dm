@@ -1,7 +1,7 @@
 import { DisclosureFrame } from '@sd-jwt/types';
 import { KeyObject, X509Certificate, createHash, createSign } from 'crypto';
 import { base64urlEncode } from '@sd-jwt/utils';
-import { ALGORITHMS } from './constant';
+import { ALGORITHMS, CommitmentOIDs } from './constant';
 import { GeneralJSON, SDJwtGeneralJSONInstance } from '@sd-jwt/core';
 import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 
@@ -43,6 +43,11 @@ export type GeneralJWS = {
     };
   }>;
 };
+
+export type CommitmentOption = Array<{
+  commId: string | CommitmentOIDs;
+  commQuals?: Array<Record<string, unknown>>;
+}>;
 
 export class Sign<T extends Record<string, unknown>> {
   private serialized?: GeneralJWS;
@@ -297,6 +302,11 @@ export class Sign<T extends Record<string, unknown>> {
 
   setCty(cty: string) {
     this.protectedHeader.cty = cty;
+    return this;
+  }
+
+  setCommitment(option: CommitmentOption) {
+    this.protectedHeader.srCms = option;
     return this;
   }
 
