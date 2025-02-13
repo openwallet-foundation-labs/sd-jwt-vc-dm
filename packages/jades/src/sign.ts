@@ -10,6 +10,7 @@ import {
   GeneralJWS,
   ProtectedHeader,
   SigD,
+  UnprotectedHeader,
 } from './type';
 
 export class Sign<T extends Record<string, unknown>> {
@@ -19,7 +20,7 @@ export class Sign<T extends Record<string, unknown>> {
 
   // TODO: implement
   // unprotected header
-  private header: Record<string, unknown>;
+  private header: UnprotectedHeader;
 
   private disclosureFrame: DisclosureFrame<T> | undefined;
 
@@ -270,6 +271,11 @@ export class Sign<T extends Record<string, unknown>> {
 
   setCommitment(option: CommitmentOption) {
     this.protectedHeader.srCms = option;
+    return this;
+  }
+
+  setUnprotectedHeader(header: UnprotectedHeader) {
+    this.header = header;
     return this;
   }
 
