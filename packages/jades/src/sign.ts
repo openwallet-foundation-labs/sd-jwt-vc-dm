@@ -163,6 +163,8 @@ export class Sign<T extends Record<string, unknown>> {
       throw new Error('alg must be set and not "none"');
     }
 
+    this.validateCertificateHeaders();
+
     if (this.serialized !== undefined) {
       return this.appendSignature(key, kid);
     }
@@ -277,6 +279,20 @@ export class Sign<T extends Record<string, unknown>> {
   setUnprotectedHeader(header: UnprotectedHeader) {
     this.header = header;
     return this;
+  }
+
+  private validateCertificateHeaders() {
+    const hasCertHeader = !!(
+      this.protectedHeader['x5t#S256'] ||
+      this.protectedHeader.x5c ||
+      this.protectedHeader['x5t#o'] ||
+      this.protectedHeader.sigX5ts
+    );
+    if (!hasCertHeader) {
+      throw new Error(
+        'JAdES signature requires at least one certificate header',
+      );
+    }
   }
 
   toJSON() {
