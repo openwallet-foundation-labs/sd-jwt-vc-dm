@@ -124,7 +124,20 @@ importers:
         specifier: ^5.1.3
         version: 5.7.3
 
-  packages/jades: {}
+  packages/jades:
+    dependencies:
+      '@sd-jwt/core':
+        specifier: ^0.9.2
+        version: 0.9.2
+      '@sd-jwt/crypto-nodejs':
+        specifier: ^0.9.2
+        version: 0.9.2
+      '@sd-jwt/types':
+        specifier: ^0.9.2
+        version: 0.9.2
+      '@sd-jwt/utils':
+        specifier: ^0.9.2
+        version: 0.9.2
 
   packages/vcdm: {}
 
@@ -1160,6 +1173,30 @@ packages:
     resolution: {integrity: sha512-UOo5FdvOL0+eIVTgS4tIdbW+TtnBLWg1YBCcU2KWM7nuNwRz9bksDX1bekJJCpu25N1DVWaCwnT39dVQxzqS8g==}
     cpu: [x64]
     os: [win32]
+
+  '@sd-jwt/core@0.9.2':
+    resolution: {integrity: sha512-AbvID/VIogRtPtCWGmfUlCZczHaBSRFmTwOAiUeuPRjDJTGUQu3gMRKwsfSGRHlfPo0pSaRQ7lqN3N+a5i+SDA==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/crypto-nodejs@0.9.2':
+    resolution: {integrity: sha512-OL5drLhrsDok60XfLoovAK+DT/6mA1myZe1tkA8JflV8tcx4OZTLi/UMVcW/hc+7nBugYICutVSoIejTYsgbEw==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/decode@0.9.2':
+    resolution: {integrity: sha512-jHY7hqk7EMkp6E2cB13QmXvRZN7njvAveVh+zKKy0kxpAM7DmcR4TqcDA4mc5y4lP8zWFUgbk7oGLCx2wiBq+w==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/present@0.9.2':
+    resolution: {integrity: sha512-ozBDYfQxUCwu0N+gbyk6zJDraMslFFuNLW+GxITybdDfVJek65tBtbROB8ZBvkAlEl0PDRKebq+xKOCRmplmWA==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/types@0.9.2':
+    resolution: {integrity: sha512-eV/MY80ekeTrqaohzPpkrgwPki6Igx69D6RniduV1Ehv6o/zaJQ2F0hY/RqBAkJhQtBQoOzouwKYHme40k1Dlw==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/utils@0.9.2':
+    resolution: {integrity: sha512-GpTD0isav2f+JyMyzeyf6wV3nYcD5e3oL+sVVr/61Y3oaIBGMWLtGGGhBRMCimSnd8kbb0P9jLxvp7ioASk6vw==}
+    engines: {node: '>=18'}
 
   '@sigstore/bundle@1.1.0':
     resolution: {integrity: sha512-PFutXEy0SmQxYI4texPw3dd2KewuNqv7OuK1ZFtY2fM754yhvG2KdgwIhRnoEE2uHdtdGNQ8s0lb94dW9sELog==}
@@ -3143,6 +3180,9 @@ packages:
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
+
+  js-base64@3.7.7:
+    resolution: {integrity: sha512-7rCnleh0z2CkXhH67J8K1Ytz0b2Y+yxTPL+/KOJoa20hfnVQ/3/T6W/KflYI4bRHRagNeXeU2bkNGI3v1oS/lw==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -6206,6 +6246,33 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.18.0':
     optional: true
 
+  '@sd-jwt/core@0.9.2':
+    dependencies:
+      '@sd-jwt/decode': 0.9.2
+      '@sd-jwt/present': 0.9.2
+      '@sd-jwt/types': 0.9.2
+      '@sd-jwt/utils': 0.9.2
+
+  '@sd-jwt/crypto-nodejs@0.9.2': {}
+
+  '@sd-jwt/decode@0.9.2':
+    dependencies:
+      '@sd-jwt/types': 0.9.2
+      '@sd-jwt/utils': 0.9.2
+
+  '@sd-jwt/present@0.9.2':
+    dependencies:
+      '@sd-jwt/decode': 0.9.2
+      '@sd-jwt/types': 0.9.2
+      '@sd-jwt/utils': 0.9.2
+
+  '@sd-jwt/types@0.9.2': {}
+
+  '@sd-jwt/utils@0.9.2':
+    dependencies:
+      '@sd-jwt/types': 0.9.2
+      js-base64: 3.7.7
+
   '@sigstore/bundle@1.1.0':
     dependencies:
       '@sigstore/protobuf-specs': 0.2.1
@@ -8671,6 +8738,8 @@ snapshots:
   jose@5.3.0: {}
 
   joycon@3.1.1: {}
+
+  js-base64@3.7.7: {}
 
   js-tokens@4.0.0: {}
 
