@@ -18,6 +18,8 @@ describe('createKidFromCert', () => {
     const kid = createKidFromCert(testCert);
 
     console.log(kid);
+    // Check if output is defined
+    expect(kid).toBeDefined();
     // Check if output is base64 encoded
     expect(() => Buffer.from(kid, 'base64')).not.toThrow();
   });
