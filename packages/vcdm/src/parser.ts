@@ -29,7 +29,7 @@ export const parseSdJwtVcdm = (sdjwtOrjwt: string) => {
     };
   }
 
-  const decodedSdJwt = decodeSdJwtSync(jwt, hasher);
+  const decodedSdJwt = decodeSdJwtSync(sdjwtOrjwt, hasher);
   const claims = getClaimsSync(
     decodedSdJwt.jwt.payload,
     decodedSdJwt.disclosures,
