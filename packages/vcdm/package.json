@@ -44,5 +44,10 @@
       "cjs",
       "esm"
     ]
+  },
+  "dependencies": {
+    "@sd-jwt/decode": "^0.9.2",
+    "@sd-jwt/hash": "^0.9.2",
+    "@sd-jwt/sd-jwt-vc": "^0.9.2"
   }
 }
