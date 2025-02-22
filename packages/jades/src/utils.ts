@@ -12,7 +12,7 @@ export const parseCerts = (chainPem: string): X509Certificate[] => {
  * Creates a JAdES-compliant kid from X.509 certificate
  * According to TS 119 182-1 v1.2.1 section 5.1.4
  */
-export default function createKidFromCert(cert: X509Certificate) {
+export function createKidFromCert(cert: X509Certificate) {
   /*
 
 	KID = base64url(derEncodeSequence(IssuerSerial))
