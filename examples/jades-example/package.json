@@ -1,0 +1,21 @@
+{
+  "name": "jades-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bb": "tsx bb.ts",
+    "bt": "tsx bt.ts",
+    "blt": "tsx blt.ts",
+    "blta": "tsx blta.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sd-jwt-jades": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3"
+  }
+}
