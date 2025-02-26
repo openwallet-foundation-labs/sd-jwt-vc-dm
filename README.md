@@ -16,12 +16,12 @@ This library provides interoperability between SD-JWT (Selective Disclosure JWT)
 
 ### JAdES Digital Signature Integration
 
-Implements JAdES (JSON Advanced Electronic Signatures) standard for SD-JWT with support for the following signature profiles:
+Implements JAdES (JSON Advanced Electronic Signatures) standard for SD-JWT:
 
-- **B-B (Basic - Baseline)**: Basic signature format
-- **B-T (Basic with Time)**: Signatures with timestamp
-- **B-LT (Basic Long-Term)**: Signatures with validation data for long-term preservation
-- **B-LTA (Basic Long-Term with Archive timestamps)**: Long-term preservation with periodic timestamp renewal
+- **B-B (Basic - Baseline)**: Full support for basic signature format
+- **B-T (Basic with Time)**: Basic support for signatures with timestamp
+- **B-LT (Basic Long-Term)**: Structure defined
+- **B-LTA (Basic Long-Term with Archive timestamps)**: Structure defined
 
 ## Installation
 
