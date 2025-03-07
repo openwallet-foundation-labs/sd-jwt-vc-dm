@@ -72,6 +72,7 @@ export function IssuerPanel() {
       const disclosureFrame = getDisclosureFrame(
         options.disclosureTemplate,
         options.customDisclosureFrame,
+        selectedExample,
       );
 
       // Call our API endpoint
