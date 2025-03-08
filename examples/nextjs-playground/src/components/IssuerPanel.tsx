@@ -110,9 +110,9 @@ export function IssuerPanel() {
 
   const getDisclosureLabel = (selectedExample: string) => {
     const labels: Record<string, string> = {
-      'Driver License': 'License Class, License Number, Name',
-      'VCDM Credential': 'Given Name, Family Name',
-      'Basic Identity': 'Given Name, Family Name, Email',
+      'Driver License': 'license class, license number, name',
+      'VCDM Credential': 'given name, family name',
+      'Basic Identity': 'given name, family name, email',
     };
     return labels[selectedExample]
       ? `(${labels[selectedExample]} disclosable)`
