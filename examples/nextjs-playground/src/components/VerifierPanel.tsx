@@ -11,7 +11,6 @@ export function VerifierPanel() {
   const [options, setOptions] = useState({
     challenge: 'verifierChallenge',
     domain: 'example.org',
-    additionalContexts: '"https://schema.org/"',
   });
   // These states are used to track the issuing process for user feedback. They are not necessary for the core functionality.
   const [isVerifying, setIsVerifying] = useState(false);
@@ -130,22 +129,6 @@ export function VerifierPanel() {
                 className="w-full border rounded px-3 py-2"
                 value={options.domain}
                 onChange={(e) => handleOptionsChange('domain', e.target.value)}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="additionalContexts"
-                className="block text-sm font-medium mb-1"
-              >
-                Additional Contexts for VP
-              </label>
-              <input
-                id="additionalContexts"
-                className="w-full border rounded px-3 py-2"
-                value={options.additionalContexts}
-                onChange={(e) =>
-                  handleOptionsChange('additionalContexts', e.target.value)
-                }
               />
             </div>
           </div>
