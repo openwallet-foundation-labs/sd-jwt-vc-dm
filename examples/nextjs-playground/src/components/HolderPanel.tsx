@@ -12,11 +12,10 @@ export function HolderPanel() {
   const [options, setOptions] = useState({
     viewMode: JWTViewMode.DECODED,
   });
+  const [presentFrame, setPresentFrame] = useState<Record<string, boolean>>({});
   // These states are used to track the issuing process for user feedback. They are not necessary for the core functionality.
   const [isPresenting, setIsPresenting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [presentFrame, setPresentFrame] = useState<Record<string, boolean>>({});
 
   // Extract disclosures and their field names
   const disclosures = useMemo<Disclosure[]>(() => {

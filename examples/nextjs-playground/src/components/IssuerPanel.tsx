@@ -108,6 +108,17 @@ export function IssuerPanel() {
     }
   };
 
+  const getDisclosureLabel = (selectedExample: string) => {
+    const labels: Record<string, string> = {
+      'Driver License': 'License Class, License Number, Name',
+      'VCDM Credential': 'Given Name, Family Name',
+      'Basic Identity': 'Given Name, Family Name, Email',
+    };
+    return labels[selectedExample]
+      ? `(${labels[selectedExample]} disclosable)`
+      : '';
+  };
+
   return (
     <div className="border rounded-md p-4 mb-4 shadow-sm">
       <div className="flex items-center mb-4">
@@ -217,7 +228,7 @@ export function IssuerPanel() {
                     className="mr-2"
                   />
                   <label htmlFor="sd-basic" className="text-sm">
-                    Basic (name, email disclosable)
+                    Basic {getDisclosureLabel(selectedExample)}
                   </label>
                 </div>
 
