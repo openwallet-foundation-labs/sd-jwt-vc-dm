@@ -14,7 +14,6 @@ interface CredentialContextType {
   setIssuerCredential: (credential: Credential | null) => void;
   setHolderCredential: (credential: Credential | null) => void;
   setVerifierCredential: (credential: Credential | null) => void;
-  verifyCredential: () => void;
 }
 
 const CredentialContext = createContext<CredentialContextType | undefined>(
@@ -31,17 +30,6 @@ export function CredentialProvider({ children }: { children: ReactNode }) {
   const [verifierCredential, setVerifierCredential] =
     useState<Credential | null>(null);
 
-  const verifyCredential = () => {
-    if (verifierCredential) {
-      // In a real implementation, we would use the library to verify the credential
-      // For now, just mark as verified or unverified randomly
-      setVerifierCredential({
-        ...verifierCredential,
-        status: Math.random() > 0.2 ? 'verified' : 'unverified',
-      });
-    }
-  };
-
   return (
     <CredentialContext.Provider
       value={{
@@ -51,7 +39,6 @@ export function CredentialProvider({ children }: { children: ReactNode }) {
         setIssuerCredential,
         setHolderCredential,
         setVerifierCredential,
-        verifyCredential,
       }}
     >
       {children}

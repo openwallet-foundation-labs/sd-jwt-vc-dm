@@ -1,4 +1,3 @@
-// src/app/api/presentation/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -12,7 +11,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ verified: true });
+    return NextResponse.json({ verified: Math.random() > 0.2 });
   } catch (error) {
     console.error('Error creating presentation:', error);
     return NextResponse.json(

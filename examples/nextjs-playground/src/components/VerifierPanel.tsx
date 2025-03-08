@@ -3,15 +3,55 @@
 import { useState } from 'react';
 import { useCredentials } from '@/context/CredentialContext';
 import { JsonEditor } from '@/components/JsonEditor';
+import { parseSDJson } from '@/utils/parseSDJson';
 
 export function VerifierPanel() {
-  const { verifierCredential, verifyCredential } = useCredentials();
+  const { verifierCredential, setVerifierCredential } = useCredentials();
   const [showOptions, setShowOptions] = useState(false);
   const [options, setOptions] = useState({
     challenge: 'verifierChallenge',
     domain: 'example.org',
     additionalContexts: '"https://schema.org/"',
   });
+  // These states are used to track the issuing process for user feedback. They are not necessary for the core functionality.
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const verifyCredential = async () => {
+    if (!verifierCredential) return;
+
+    setIsVerifying(true);
+    setError(null);
+
+    try {
+      // Call the verification endpoint
+      const response = await fetch('/api/jades/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          credential: verifierCredential.content,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create presentation');
+      }
+      const data = await response.json();
+      // Set the verification result
+      setVerifierCredential({
+        ...verifierCredential,
+        status: data.verified ? 'verified' : 'unverified',
+      });
+    } catch (err) {
+      setError((err as Error).message);
+      console.error('Error verifying presentation:', err);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleOptionsChange = (
     key: keyof typeof options,
@@ -36,12 +76,19 @@ export function VerifierPanel() {
           <button
             onClick={verifyCredential}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            disabled={!verifierCredential}
+            disabled={!verifierCredential || isVerifying}
           >
-            VERIFY
+            {isVerifying ? 'Verifying...' : 'Verify'}
           </button>
         </div>
       </div>
+
+      {/* error message for user feedback */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
 
       {/* Options Section with standard HTML */}
       <div className="mb-4 border-b pb-2">
@@ -122,7 +169,11 @@ export function VerifierPanel() {
             </span>
           </div>
           <JsonEditor
-            value={verifierCredential.content}
+            value={JSON.stringify(
+              parseSDJson(verifierCredential.content),
+              null,
+              2,
+            )}
             readOnly={true}
             height="300px"
           />
