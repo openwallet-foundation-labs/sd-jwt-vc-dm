@@ -3,7 +3,7 @@ import { X509Certificate } from 'crypto';
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import createKidFromCert from '../utils';
+import { createKidFromCert } from '../utils';
 
 describe('createKidFromCert', () => {
   let testCert: X509Certificate;
