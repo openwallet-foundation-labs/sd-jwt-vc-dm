@@ -1,4 +1,3 @@
-// src/app/api/presentation/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -6,6 +5,7 @@ export async function POST(request: NextRequest) {
     // Extract data from the request
     const { credential, presentFrame } = await request.json();
     console.log(presentFrame);
+    console.log(credential);
 
     if (!credential || !presentFrame) {
       return NextResponse.json(
