@@ -2,13 +2,14 @@ import { SDJwtGeneralJSONInstance, GeneralJSON } from '@sd-jwt/core';
 import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { PresentationFrame } from '@sd-jwt/types';
 import { SDJWTException } from '@sd-jwt/utils';
+import { GeneralJWS } from './type';
 
 export class Present {
   public static async present<T extends Record<string, unknown>>(
-    credential: GeneralJSON | string,
+    credential: GeneralJWS | string,
     presentationFrame?: PresentationFrame<T>,
     options?: Record<string, unknown>,
-  ): Promise<GeneralJSON> {
+  ): Promise<GeneralJWS> {
     // Initialize the SD JWT instance with proper configuration
     const sdJwtInstance = new SDJwtGeneralJSONInstance({
       hashAlg: 'sha-256',
@@ -29,7 +30,7 @@ export class Present {
         );
       }
     } else {
-      generalJsonCredential = credential;
+      generalJsonCredential = GeneralJSON.fromSerialized(credential);
     }
 
     // If there are no disclosures, return the credential as is
@@ -41,7 +42,7 @@ export class Present {
       console.log(
         'Credential has no selective disclosure claims, returning as is',
       );
-      return generalJsonCredential;
+      return generalJsonCredential.toJson();
     }
 
     // Use the instance's present method for the core SD-JWT functionality
@@ -50,6 +51,6 @@ export class Present {
       presentationFrame,
     );
 
-    return presentedCredential;
+    return presentedCredential.toJson();
   }
 }

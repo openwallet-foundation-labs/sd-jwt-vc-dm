@@ -12,9 +12,7 @@ import { JWTVerifier } from '../verify';
 describe('Present', () => {
   let testCert: X509Certificate[];
   let privateKey: KeyObject;
-  let originalCredential: GeneralJSON;
   let signedCredentialJson: any;
-  let originalCredentialWithoutSD: GeneralJSON;
   let signedCredentialJsonWithoutSD: any;
 
   // Create a credential to use in tests
@@ -60,7 +58,6 @@ describe('Present', () => {
       .sign(privateKey, 'test-kid');
 
     signedCredentialJson = result.toJSON();
-    originalCredential = GeneralJSON.fromSerialized(signedCredentialJson);
 
     const sign2 = new Sign(payload);
     const result2 = await sign2
@@ -75,9 +72,6 @@ describe('Present', () => {
       .sign(privateKey, 'test-kid');
 
     signedCredentialJsonWithoutSD = result2.toJSON();
-    originalCredentialWithoutSD = GeneralJSON.fromSerialized(
-      signedCredentialJsonWithoutSD,
-    );
   });
 
   describe('present method', () => {
@@ -88,9 +82,14 @@ describe('Present', () => {
         family_name: true,
       };
 
-      const presentedCredential = await Present.present(
-        originalCredential,
+      const presentedCredentialJson = await Present.present(
+        signedCredentialJson,
         presentationFrame,
+      );
+
+      // Convert the JSON result back to GeneralJSON for verification
+      const presentedCredential = GeneralJSON.fromSerialized(
+        presentedCredentialJson,
       );
 
       // Verify the presented credential
@@ -120,13 +119,15 @@ describe('Present', () => {
 
       const jsonString = JSON.stringify(signedCredentialJson, null, 2);
 
-      const presentedCredential = await Present.present(
+      const presentedCredentialJson = await Present.present(
         jsonString,
         presentationFrame,
       );
 
-      console.log(originalCredentialWithoutSD);
-      console.log(presentedCredential);
+      // Convert the JSON result back to GeneralJSON for verification
+      const presentedCredential = GeneralJSON.fromSerialized(
+        presentedCredentialJson,
+      );
 
       // Verify the presented credential
       const instance = new SDJwtGeneralJSONInstance({
@@ -137,40 +138,44 @@ describe('Present', () => {
       const verifiedData = await instance.verify(presentedCredential);
 
       expect(verifiedData).toBeDefined();
+      expect(verifiedData.payload).toHaveProperty('given_name');
+      expect(verifiedData.payload).toHaveProperty('family_name');
+      expect(verifiedData.payload).toHaveProperty('license_class');
+      expect(verifiedData.payload).not.toHaveProperty('license_number');
     });
 
     it('should create a presentation without SD', async () => {
-      const presentedCredential = await Present.present(
-        originalCredentialWithoutSD,
+      const presentedCredentialJson = await Present.present(
+        signedCredentialJsonWithoutSD,
       );
+
       // Verify the result is returned correctly
-      expect(presentedCredential).toBeDefined();
+      expect(presentedCredentialJson).toBeDefined();
 
       // Verify that the presented credential is the same as the original
-      // since there are no selective disclosures to apply
-      expect(presentedCredential.payload).toEqual(
-        originalCredentialWithoutSD.payload,
+      // (compare key properties since we're getting back a plain object now)
+      expect(presentedCredentialJson.payload).toEqual(
+        signedCredentialJsonWithoutSD.payload,
       );
-      expect(presentedCredential.signatures).toEqual(
-        originalCredentialWithoutSD.signatures,
+      expect(presentedCredentialJson.signatures).toEqual(
+        signedCredentialJsonWithoutSD.signatures,
       );
     });
 
     it('should handle JSON without SD input as a string', async () => {
       const jsonString = JSON.stringify(signedCredentialJsonWithoutSD, null, 2);
 
-      const presentedCredential = await Present.present(jsonString);
+      const presentedCredentialJson = await Present.present(jsonString);
 
       // Verify the result is returned correctly
-      expect(presentedCredential).toBeDefined();
+      expect(presentedCredentialJson).toBeDefined();
 
-      // Verify that the presented credential is the same as the original
-      // since there are no selective disclosures to apply
-      expect(presentedCredential.payload).toEqual(
-        originalCredentialWithoutSD.payload,
+      // Verify that the presented credential has the same structure as the original
+      expect(presentedCredentialJson.payload).toEqual(
+        signedCredentialJsonWithoutSD.payload,
       );
-      expect(presentedCredential.signatures).toEqual(
-        originalCredentialWithoutSD.signatures,
+      expect(presentedCredentialJson.signatures).toEqual(
+        signedCredentialJsonWithoutSD.signatures,
       );
     });
   });
