@@ -113,7 +113,7 @@ export function HolderPanel() {
 
       // Update the verifier credential with the presentation
       setVerifierCredential({
-        content: data.credential,
+        content: JSON.stringify(data.presentation, null, 2),
         status: 'presented',
       });
     } catch (err) {
