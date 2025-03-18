@@ -1,4 +1,4 @@
-import { createVerify, X509Certificate } from 'crypto';
+import { createVerify, X509Certificate, BinaryLike, KeyObject } from 'crypto';
 import { GeneralJWS } from './type';
 import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
 import { digest } from '@sd-jwt/crypto-nodejs';
@@ -82,17 +82,18 @@ export class JWTVerifier {
       }
 
       const certDer = Buffer.from(x5c[0], 'base64');
-      const cert = new X509Certificate(certDer);
+      const cert = new X509Certificate(new Uint8Array(certDer));
       const publicKey = cert.publicKey;
 
       const signatureBytes = Buffer.from(sig, 'base64url');
+      const signatureUint8Array = new Uint8Array(signatureBytes);
 
       const cryptoAlgorithm = this.getVerifyAlgorithm(algorithm);
 
       const verifier = createVerify(cryptoAlgorithm);
       verifier.update(data);
 
-      return verifier.verify(publicKey, signatureBytes);
+      return verifier.verify(publicKey, signatureUint8Array);
     } catch (error) {
       console.error('JWT verification error:', error);
       return false;
