@@ -1,11 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
-
-type Credential = {
-  content: string;
-  status?: 'issued' | 'presented' | 'verified' | 'unverified';
-};
+import { Credential } from '@/types/credential';
 
 interface CredentialContextType {
   issuerCredential: Credential | null;
