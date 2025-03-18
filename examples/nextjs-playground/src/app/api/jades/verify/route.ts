@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { JAdES } from 'sd-jwt-jades';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ verified: Math.random() > 0.2 });
+    // If verification fails (e.g., invalid signature, tampered data),
+    // JAdES.Verify.verify() throws an exception, which will be handled in the following catch block.
+    const result = await JAdES.Verify.verify(credential);
+
+    return NextResponse.json({
+      verified: true,
+      credential: {
+        payload: result.payload,
+        headers: result.headers,
+        ...(result.kb && { keyBinding: result.kb }),
+      },
+    });
   } catch (error) {
     console.error('Error creating presentation:', error);
     return NextResponse.json(
