@@ -1,7 +1,29 @@
 import { createVerify, X509Certificate } from 'crypto';
+import { GeneralJWS } from './type';
+import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
+import { digest } from '@sd-jwt/crypto-nodejs';
+import { getGeneralJSONFromJWSToken } from './utils';
 
 export class JWTVerifier {
-  static verify(data: string, signatureB64: string): boolean {
+  static async verify(
+    credential: GeneralJWS | string,
+    requiredClaimKeys?: string[],
+  ) {
+    const instance = new SDJwtGeneralJSONInstance({
+      hasher: digest,
+      verifier: JWTVerifier.verifier,
+    });
+
+    const generalJsonCredential = getGeneralJSONFromJWSToken(credential);
+
+    const verifiedData = await instance.verify(
+      generalJsonCredential,
+      requiredClaimKeys,
+    );
+    return verifiedData;
+  }
+
+  static verifier(data: string, signatureB64: string): boolean {
     try {
       const [headerB64, payloadB64] = data.split('.');
 

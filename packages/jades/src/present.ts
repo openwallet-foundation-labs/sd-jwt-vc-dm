@@ -1,8 +1,8 @@
-import { SDJwtGeneralJSONInstance, GeneralJSON } from '@sd-jwt/core';
+import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
 import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { PresentationFrame } from '@sd-jwt/types';
-import { SDJWTException } from '@sd-jwt/utils';
 import { GeneralJWS } from './type';
+import { getGeneralJSONFromJWSToken } from './utils';
 
 export class Present {
   public static async present<T extends Record<string, unknown>>(
@@ -18,20 +18,7 @@ export class Present {
     });
 
     // Convert string to GeneralJSON if needed
-    let generalJsonCredential: GeneralJSON;
-    if (typeof credential === 'string') {
-      try {
-        const parsed = JSON.parse(credential);
-        generalJsonCredential = GeneralJSON.fromSerialized(parsed);
-      } catch (error) {
-        throw new SDJWTException(
-          'Invalid credential format: not a valid JSON',
-          error,
-        );
-      }
-    } else {
-      generalJsonCredential = GeneralJSON.fromSerialized(credential);
-    }
+    const generalJsonCredential = getGeneralJSONFromJWSToken(credential);
 
     // If there are no disclosures, return the credential as is
     // This prevents errors from the core library when handling credentials without SD claims

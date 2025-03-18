@@ -95,7 +95,7 @@ describe('Present', () => {
       // Verify the presented credential
       const instance = new SDJwtGeneralJSONInstance({
         hasher: digest,
-        verifier: JWTVerifier.verify,
+        verifier: JWTVerifier.verifier,
       });
 
       const verifiedData = await instance.verify(presentedCredential);
@@ -132,7 +132,7 @@ describe('Present', () => {
       // Verify the presented credential
       const instance = new SDJwtGeneralJSONInstance({
         hasher: digest,
-        verifier: JWTVerifier.verify,
+        verifier: JWTVerifier.verifier,
       });
 
       const verifiedData = await instance.verify(presentedCredential);
