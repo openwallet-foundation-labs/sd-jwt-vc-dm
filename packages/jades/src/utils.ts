@@ -1,5 +1,8 @@
 import { X509Certificate } from 'crypto';
 import { Sequence, CharacterString, Integer } from 'asn1js';
+import { GeneralJSON } from '@sd-jwt/core';
+import { GeneralJWS } from './type';
+import { SDJWTException } from '@sd-jwt/utils';
 
 export const parseCerts = (chainPem: string): X509Certificate[] => {
   return chainPem
@@ -74,4 +77,21 @@ export const createKidFromCert = (cert: X509Certificate) => {
 
   // Return the base64 encoding of the DER-encoded sequence
   return Buffer.from(derEncoded).toString('base64');
+};
+
+export const getGeneralJSONFromJWSToken = (
+  credential: GeneralJWS | string,
+): GeneralJSON => {
+  if (typeof credential === 'string') {
+    try {
+      const parsed = JSON.parse(credential);
+      return GeneralJSON.fromSerialized(parsed);
+    } catch (error) {
+      throw new SDJWTException(
+        'Invalid credential format: not a valid JSON',
+        error,
+      );
+    }
+  }
+  return GeneralJSON.fromSerialized(credential);
 };
