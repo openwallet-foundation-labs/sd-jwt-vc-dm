@@ -1,4 +1,4 @@
-import { createVerify, X509Certificate, BinaryLike, KeyObject } from 'crypto';
+import { createVerify, X509Certificate } from 'crypto';
 import { GeneralJWS } from './type';
 import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
 import { digest } from '@sd-jwt/crypto-nodejs';
