@@ -52,7 +52,7 @@ export function JsonEditor({
         {!readOnly && (
           <button
             onClick={formatJson}
-            className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+            className="text-xs bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-2 py-1 rounded"
           >
             Format
           </button>
@@ -63,7 +63,7 @@ export function JsonEditor({
         onChange={handleChange}
         readOnly={readOnly}
         style={{ height }}
-        className="w-full font-mono text-sm p-2 border rounded bg-gray-50 overflow-auto"
+        className="w-full font-mono text-sm p-2 border rounded bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 overflow-auto"
         spellCheck="false"
       />
       {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
