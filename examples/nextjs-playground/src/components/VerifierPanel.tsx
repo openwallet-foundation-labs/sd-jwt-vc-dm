@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCredentials } from '@/context/CredentialContext';
 import { JsonEditor } from '@/components/JsonEditor';
 import { parseSDJson } from '@/utils/parseSDJson';
+import { JWTViewMode } from '@/types/options';
 
 export function VerifierPanel() {
   const { verifierCredential, setVerifierCredential } = useCredentials();
@@ -11,6 +12,7 @@ export function VerifierPanel() {
   const [options, setOptions] = useState({
     challenge: 'verifierChallenge',
     domain: 'example.org',
+    viewMode: JWTViewMode.RAW,
   });
   // These states are used to track the issuing process for user feedback. They are not necessary for the core functionality.
   const [isVerifying, setIsVerifying] = useState(false);
@@ -36,16 +38,29 @@ export function VerifierPanel() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create presentation');
+        throw new Error(errorData.error || 'Failed to verify presentation');
       }
       const data = await response.json();
       // Set the verification result
       setVerifierCredential({
         ...verifierCredential,
         status: data.verified ? 'verified' : 'unverified',
+        verificationResult: data.credential,
       });
+
+      // If the presentation is verified, switch to the verified view mode
+      if (data.verified) {
+        setOptions({
+          ...options,
+          viewMode: JWTViewMode.DECODED,
+        });
+      }
     } catch (err) {
       setError((err as Error).message);
+      setVerifierCredential({
+        ...verifierCredential,
+        status: 'unverified',
+      });
       console.error('Error verifying presentation:', err);
     } finally {
       setIsVerifying(false);
@@ -54,7 +69,7 @@ export function VerifierPanel() {
 
   const handleOptionsChange = (
     key: keyof typeof options,
-    value: string | boolean | number,
+    value: string | boolean | number | JWTViewMode,
   ) => {
     setOptions({
       ...options,
@@ -151,15 +166,75 @@ export function VerifierPanel() {
                 : 'unverified'}
             </span>
           </div>
-          <JsonEditor
-            value={JSON.stringify(
-              parseSDJson(verifierCredential.content),
-              null,
-              2,
+
+          <div className="flex border-b mb-4">
+            <button
+              className={`px-4 py-2 ${
+                options.viewMode === JWTViewMode.RAW
+                  ? 'border-b-2 border-blue-500'
+                  : ''
+              }`}
+              onClick={() => handleOptionsChange('viewMode', JWTViewMode.RAW)}
+            >
+              Raw
+            </button>
+            {verifierCredential.verificationResult && (
+              <button
+                className={`px-4 py-2 ${
+                  options.viewMode === 'decoded'
+                    ? 'border-b-2 border-green-500'
+                    : ''
+                }`}
+                onClick={() =>
+                  handleOptionsChange('viewMode', JWTViewMode.DECODED)
+                }
+              >
+                Verification Details
+              </button>
             )}
-            readOnly={true}
-            height="300px"
-          />
+          </div>
+          {/* Display the verifier credential in the selected view mode */}
+          {options.viewMode === JWTViewMode.RAW && (
+            <JsonEditor
+              value={JSON.stringify(
+                parseSDJson(verifierCredential.content),
+                null,
+                2,
+              )}
+              readOnly={true}
+              height="300px"
+            />
+          )}
+          {options.viewMode === JWTViewMode.DECODED &&
+            verifierCredential.verificationResult && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium mb-2">Verified Payload</h3>
+                  <JsonEditor
+                    value={JSON.stringify(
+                      verifierCredential.verificationResult.payload,
+                      null,
+                      2,
+                    )}
+                    readOnly={true}
+                    height="200px"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-2">Headers</h3>
+                  <JsonEditor
+                    value={JSON.stringify(
+                      verifierCredential.verificationResult.headers,
+                      null,
+                      2,
+                    )}
+                    readOnly={true}
+                    height="150px"
+                  />
+                </div>
+              </div>
+            )}
         </div>
       ) : (
         <div className="p-4 border border-dashed rounded-md text-center text-gray-500">
