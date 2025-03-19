@@ -182,7 +182,7 @@ export function IssuerPanel() {
             <label className="block text-sm font-medium mb-1">
               Selective Disclosure
             </label>
-            <div className="p-3 border rounded bg-gray-50">
+            <div className="p-3 border rounded bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
               <p className="text-sm mb-2">
                 Select fields to be selectively disclosable:
               </p>

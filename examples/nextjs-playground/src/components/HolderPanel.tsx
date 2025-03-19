@@ -8,7 +8,6 @@ import { parseSDJson } from '@/utils/parseSDJson';
 
 export function HolderPanel() {
   const { holderCredential, setVerifierCredential } = useCredentials();
-  const [showOptions, setShowOptions] = useState(false);
   const [options, setOptions] = useState({
     viewMode: JWTViewMode.DECODED,
   });
@@ -113,7 +112,7 @@ export function HolderPanel() {
 
       // Update the verifier credential with the presentation
       setVerifierCredential({
-        content: data.credential,
+        content: JSON.stringify(data.presentation, null, 2),
         status: 'presented',
       });
     } catch (err) {
@@ -150,36 +149,6 @@ export function HolderPanel() {
           {error}
         </div>
       )}
-
-      {/* Options Section with standard HTML */}
-      <div className="mb-4 border-b pb-2">
-        <button
-          className="flex items-center justify-between w-full text-left font-medium"
-          onClick={() => setShowOptions(!showOptions)}
-        >
-          Options
-          <span>{showOptions ? '▼' : '►'}</span>
-        </button>
-
-        {showOptions && (
-          <div className="mt-2 space-y-4">
-            <div>
-              <label
-                htmlFor="secret"
-                className="block text-sm font-medium mb-1"
-              >
-                Secret
-              </label>
-              {/* <input
-                id="secret"
-                className="w-full border rounded px-3 py-2"
-                value={options.viewMode}
-                onChange={(e) => handleOptionsChange('viewMode', e.target.value)}
-              /> */}
-            </div>
-          </div>
-        )}
-      </div>
 
       {holderCredential ? (
         <>

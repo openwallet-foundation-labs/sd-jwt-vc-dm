@@ -263,7 +263,7 @@ describe('Sign', () => {
       expect(serialized).toBeDefined();
       const instance = new SDJwtGeneralJSONInstance({
         hasher: digest,
-        verifier: JWTVerifier.verify,
+        verifier: JWTVerifier.verifier,
       });
       const verifiedData = await instance.verify(
         GeneralJSON.fromSerialized(serialized),
