@@ -1,0 +1,16 @@
+name: Sync Fork
+
+on:
+  schedule: # https://help.github.com/en/actions/reference/events-that-trigger-workflows#schedule
+    - cron: '30 11 * * *' # Runs every day on 11:30 UTC
+  workflow_dispatch: # Allow mnual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tgymnich/fork-sync@v2
+        with:
+          head: main # branch of original repo
+          base: deployment-test # target branch of forked repo
+          auto_merge: on

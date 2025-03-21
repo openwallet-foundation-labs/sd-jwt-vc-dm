@@ -1,0 +1,60 @@
+name: Buid and Push docker image to AWS ECR
+
+on:
+  push:
+    branches:
+      - deployment-test
+    paths-ignore:
+      - 'docs/**'
+  pull_request:
+    branches:
+      - deployment-test
+    paths-ignore:
+      - 'docs/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate session name
+        id: session
+        run: |
+          repo="${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}"
+          echo "name=${repo}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     mask-aws-account-id: false
+      #     role-session-name: ${{ steps.session.outputs.name }}
+      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+         
+      # - name: Login to Amazon ECR
+      #   run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+            
+      - name: Build Docker image
+        env:
+          IMAGE_TAG: latest
+        run: |
+          pwd
+          ls -la
+          cd examples/nextjs-playground/
+          docker build -t test-image .
+
+      - name: Verification
+        run: ls -la
+

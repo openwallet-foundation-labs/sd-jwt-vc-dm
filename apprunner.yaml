@@ -1,0 +1,19 @@
+version: 1.0
+runtime: nodejs18
+build:
+  commands:
+    pre-build:
+      - pwd
+      - ls -la
+      - npm install -g pnpm
+      - pnpm install
+      - cd examples/nextjs-playground/
+      - pnpm install
+    build:
+      - pwd
+      - pnpm build
+      - cd examples/nextjs-playground/
+      - pnpm build
+run:
+  runtime-version: 18.19.0
+  command: pnpm start
