@@ -150,7 +150,16 @@ export class Sign<T extends Record<string, unknown>> {
     );
 
     const serialized = generalJSON.toJson();
-    this.serialized = serialized;
+    this.serialized = {
+      payload: serialized.payload,
+      signatures: serialized.signatures.map((sig) => ({
+        ...sig,
+        header: {
+          ...sig.header,
+          ...this.header,
+        },
+      })),
+    };
 
     return this;
   }
