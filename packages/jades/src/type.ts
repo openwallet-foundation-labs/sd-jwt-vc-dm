@@ -16,6 +16,20 @@ export type SigD = {
 
 export type Alg = keyof typeof ALGORITHMS;
 
+export type SignatureHeader = {
+  disclosures?: Array<string>;
+  kid?: string;
+  kb_jwt?: string;
+
+  /**
+   * JAdES unprotected header
+   */
+  etsiU?: any;
+
+  // Allow for extension with additional properties
+  [key: string]: any;
+};
+
 export type GeneralJWS = {
   payload: string;
   signatures: Array<{
@@ -26,16 +40,7 @@ export type GeneralJWS = {
      * This is a optional unprotected header.
      *
      */
-    header: {
-      disclosures?: Array<string>;
-      kid?: string;
-      kb_jwt?: string;
-
-      /**
-       * TODO: add JAdES unprotected header
-       */
-      etsiU?: any;
-    };
+    header: SignatureHeader;
   }>;
 };
 

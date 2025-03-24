@@ -1,7 +1,7 @@
 import { X509Certificate } from 'crypto';
 import { Sequence, CharacterString, Integer } from 'asn1js';
 import { GeneralJSON } from '@sd-jwt/core';
-import { GeneralJWS } from './type';
+import { GeneralJWS, SignatureHeader } from './type';
 import { SDJWTException } from '@sd-jwt/utils';
 
 export const parseCerts = (chainPem: string): X509Certificate[] => {
@@ -81,17 +81,28 @@ export const createKidFromCert = (cert: X509Certificate) => {
 
 export const getGeneralJSONFromJWSToken = (
   credential: GeneralJWS | string,
-): GeneralJSON => {
+): { generalJson: GeneralJSON; originalHeaders: SignatureHeader[] } => {
+  let credentialObj: GeneralJWS;
+
   if (typeof credential === 'string') {
     try {
-      const parsed = JSON.parse(credential);
-      return GeneralJSON.fromSerialized(parsed);
+      credentialObj = JSON.parse(credential);
     } catch (error) {
       throw new SDJWTException(
         'Invalid credential format: not a valid JSON',
         error,
       );
     }
+  } else {
+    credentialObj = credential;
   }
-  return GeneralJSON.fromSerialized(credential);
+
+  // Store the original headers before conversion
+  const originalHeaders =
+    credentialObj.signatures?.map((sig) => sig.header) || [];
+
+  // Convert to GeneralJSON
+  const generalJson = GeneralJSON.fromSerialized(credentialObj);
+
+  return { generalJson, originalHeaders };
 };
