@@ -8,9 +8,11 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+          pull-requests: write 
     steps:
       - uses: tgymnich/fork-sync@v2
         with:
           head: main # branch of original repo
           base: deployment-test # target branch of forked repo
-          auto_merge: on
+          auto_merge: true
