@@ -1,7 +1,7 @@
-import { SDJwtGeneralJSONInstance } from '@sd-jwt/core';
+import { SDJwtGeneralJSONInstance, GeneralJSON } from '@sd-jwt/core';
 import { digest, generateSalt } from '@sd-jwt/crypto-nodejs';
 import { PresentationFrame } from '@sd-jwt/types';
-import { GeneralJWS } from './type';
+import { GeneralJWS, SignatureHeader } from './type';
 import { getGeneralJSONFromJWSToken } from './utils';
 
 export class Present {
@@ -18,7 +18,8 @@ export class Present {
     });
 
     // Convert string to GeneralJSON if needed
-    const generalJsonCredential = getGeneralJSONFromJWSToken(credential);
+    const { generalJson: generalJsonCredential, originalHeaders } =
+      getGeneralJSONFromJWSToken(credential);
 
     // If there are no disclosures, return the credential as is
     // This prevents errors from the core library when handling credentials without SD claims
@@ -29,7 +30,8 @@ export class Present {
       console.log(
         'Credential has no selective disclosure claims, returning as is',
       );
-      return generalJsonCredential.toJson();
+
+      return this.buildGeneralJWS(generalJsonCredential, originalHeaders);
     }
 
     // Use the instance's present method for the core SD-JWT functionality
@@ -38,6 +40,26 @@ export class Present {
       presentationFrame,
     );
 
-    return presentedCredential.toJson();
+    return this.buildGeneralJWS(presentedCredential, originalHeaders);
+  }
+
+  // Builds a GeneralJWS object from the provided JSON and original headers.
+  private static buildGeneralJWS(
+    json: GeneralJSON,
+    headers: SignatureHeader[],
+  ) {
+    const result = json.toJson();
+    return {
+      payload: result.payload,
+      signatures: result.signatures.map((sig, index) => {
+        return {
+          ...sig,
+          header: {
+            ...(headers[index] || {}),
+            ...(sig.header || {}),
+          },
+        };
+      }),
+    };
   }
 }

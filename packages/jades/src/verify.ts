@@ -14,7 +14,8 @@ export class JWTVerifier {
       verifier: JWTVerifier.verifier,
     });
 
-    const generalJsonCredential = getGeneralJSONFromJWSToken(credential);
+    const { generalJson: generalJsonCredential } =
+      getGeneralJSONFromJWSToken(credential);
 
     const verifiedData = await instance.verify(
       generalJsonCredential,
