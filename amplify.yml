@@ -1,0 +1,51 @@
+version: 1
+frontend:
+  environment:
+    nodejs: "20"
+applications:
+  - appRoot: "examples/nextjs-playground"
+    frontend:
+      buildPath: '/'
+      phases:
+        preBuild:
+          commands:
+            - pwd
+            - npm install -g pnpm
+            - pnpm install
+            - cd examples/nextjs-playground/
+            - pnpm install
+        build:
+          commands:
+            - pwd
+            - npm install -g pnpm
+            - cd ../../
+            - pnpm build
+            - cd examples/nextjs-playground/
+            - pnpm build
+        postBuild:
+          commands:
+            - pwd
+            - ls -la .next/
+            
+            # - cp -rd node_modules .next/node_modules # 1. for "The 'node_modules' folder is missing the 'next' dependency."
+            # - ls -la .next/node_modules/
+
+            # - mkdir -p .next/node_modules/@eslint
+            # - ls -la node_modules/@eslint/
+            # - rm -f .next/node_modules/@eslint/eslintrc
+            #- cp -rf node_modules/@eslint/eslintrc .next/node_modules/@eslint/
+
+            - mkdir -p .next/node_modules/sd-jwt-jades 
+            - cp -r node_modules/sd-jwt-jades/* .next/node_modules/sd-jwt-jades/ # route.ts cannot find the module without this in Amplify
+            - ls -la .next/node_modules/sd-jwt-jades/
+            # - ls -la .next/node_modules/@eslint/ # Verification
+            # - find ../../ -name eslintrc 
+            # - ls -la .next/node_modules/@eslint/eslintrc/
+            # - find ../../ -name sd-jwt-jades
+            # - mkdir -p .next/node_modules/sd-jwt-jades ##
+            # - cp -r node_modules/sd-jwt-jades/* .next/node_modules/sd-jwt-jades/ # route.ts cannot find the module without this in Amplify
+      artifacts:
+        baseDirectory: examples/nextjs-playground/.next
+        files:
+          - '**/*'
+
