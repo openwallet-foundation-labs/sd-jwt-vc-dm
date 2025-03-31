@@ -41,7 +41,7 @@ export default function RootLayout({
               href="https://github.com/openwallet-foundation-labs/sd-jwt-vc-dm"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-white dark:bg-gray-800 py-2 px-4 rounded-md shadow-md transition-all hover:shadow-lg"
+              className="flex items-center gap-3 bg-white dark:bg-gray-800 py-2 px-4 rounded-md border border-gray-300 dark:border-gray-600 transition-all hover:shadow-lg"
             >
               <svg
                 height="24"
