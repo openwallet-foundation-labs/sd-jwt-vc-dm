@@ -1,7 +1,7 @@
 {
-  "name": "sd-jwt-vcdm",
+  "name": "@sd-jwt/vcld",
   "version": "0.1.1",
-  "description": "SD JWT VCDM implementation in typescript",
+  "description": "SD JWT VCLD implementation in typescript",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

@@ -1,5 +1,5 @@
 {
-  "name": "sd-jwt-jades",
+  "name": "@sd-jwt/jades",
   "version": "0.1.2",
   "description": "JADES implementation in typescript",
   "main": "dist/index.js",
