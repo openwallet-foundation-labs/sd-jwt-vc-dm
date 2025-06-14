@@ -197,6 +197,12 @@ importers:
 
   packages/vcld:
     dependencies:
+      '@sd-jwt/core':
+        specifier: ^0.10.0
+        version: 0.10.0
+      '@sd-jwt/crypto-nodejs':
+        specifier: ^0.10.0
+        version: 0.10.0
       '@sd-jwt/decode':
         specifier: ^0.10.0
         version: 0.10.0
@@ -204,6 +210,9 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       '@sd-jwt/sd-jwt-vc':
+        specifier: ^0.10.0
+        version: 0.10.0
+      '@sd-jwt/types':
         specifier: ^0.10.0
         version: 0.10.0
       '@types/jsonld':

@@ -37,5 +37,15 @@ B.3.7.2.2. Step 2: Business Logic Processing
 
  */
 
-export * from './parser';
+import { Present } from './present';
+import { decode, Signer } from './sign';
+import { JWTVerifier } from './verify';
+
 export * from './type';
+
+export const VCld = {
+  Signer,
+  decode,
+  Present,
+  Verify: JWTVerifier,
+};

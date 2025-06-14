@@ -46,9 +46,12 @@
     ]
   },
   "dependencies": {
+    "@sd-jwt/core": "^0.10.0",
+    "@sd-jwt/crypto-nodejs": "^0.10.0",
     "@sd-jwt/decode": "^0.10.0",
     "@sd-jwt/hash": "^0.10.0",
     "@sd-jwt/sd-jwt-vc": "^0.10.0",
+    "@sd-jwt/types": "^0.10.0",
     "@types/jsonld": "^1.5.15",
     "jsonld": "^8.3.3"
   }
